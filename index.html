@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Totally Accurate 8ball (maybe)</title>
+<style>
+  body {
+    background: #fff8f0;
+    font-family: "Comic Sans MS", sans-serif;
+    text-align: center;
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    user-select: none;
+  }
+  #answer {
+    font-size: 1.8em;
+    max-width: 90%;
+    transition: transform 0.5s ease;
+  }
+  .flip {
+    transform: rotateY(180deg);
+  }
+</style>
+</head>
+<body>
+
+<div id="answer">Tap anywhere to get your fate...</div>
+
+<script>
+const answers = [
+  "It is decidedly so.",
+  "Without a doubt.",
+  "Absolutely, no hesitation.",
+  "Yes, but wear a helmet.",
+  "For sure.",
+  "As certain as gravity.",
+  "You bet your socks.",
+  "Yeah, but not in the way you think.",
+  "Totally, but you'll regret it.",
+  "100% yes — trust me, I'm pixels.",
+  "Nope.",
+  "Don't even think about it.",
+  "Absolutely not.",
+  "Nah, chief.",
+  "Not today, not tomorrow.",
+  "Negative, ghost rider.",
+  "My circuits say no.",
+  "Nope, and the baguette agrees.",
+  "This is a disaster waiting to happen.",
+  "Not unless you enjoy chaos.",
+  "Ask again later.",
+  "Cannot predict now.",
+  "Unclear, try caffeine first.",
+  "Flip a coin, it'll be more fun.",
+  "The stars are on lunch break.",
+  "My sources are fighting about it.",
+  "It's foggy in here.",
+  "You're not ready for the answer.",
+  "That's above my pay grade.",
+  "Schrodinger's answer: both yes and no.",
+  "Ask again, but with jazz hands.",
+  "The baguette has spoken.",
+  "Consult a raccoon.",
+  "Yes, but only on Thursdays.",
+  "No, unless you bring snacks.",
+  "Flip your phone and try again.",
+  "Do a backflip first.",
+  "Yes, but it'll cost you a sock.",
+  "Let the wind decide.",
+  "I'm just here for the drama.",
+  "You already know the answer, coward.",
+  "That's a tomorrow problem.",
+  "Trust your gut, unless it's about sushi.",
+  "No risk, no story.",
+  "You'll survive. Probably.",
+  "Not the way you're planning it.",
+  "Do it. Or don't. I'm not your mom.",
+  "That's a 'yes' if you're brave.",
+  "The answer's yes... but it's cursed.",
+  "Would I lie to you? (Don't answer that.)",
+  "The snails disapprove.",
+  "Only if the moon winks at you.",
+  "Try turning it off and on again.",
+  "Call your mom first.",
+  "This message will self-destruct.",
+  "The cheese says oui.",
+  "The cheese says non.",
+  "Consult the nearest pigeon.",
+  "Dance and see what happens.",
+  "This is the wrong universe for that.",
+  "Yes, but only in socks.",
+  "No, unless you're underwater.",
+  "Yes, but you'll drop your phone.",
+  "Sure, if you can name three kinds of bread.",
+  "Only if your playlist slaps.",
+  "Yes, but someone's watching.",
+  "No, but it'll be hilarious.",
+  "Yes, but not until you sneeze.",
+  "That's a no from me, baguette.",
+  "Try again when Mercury isn't drunk.",
+  "YES — THE PROPHECY DEMANDS IT.",
+  "NO — THE PROPHECY FORBIDS IT.",
+  "Seek the beanbag chair of destiny.",
+  "You have been chosen. Don't waste it.",
+  "The answer was inside you all along. Ew."
+];
+
+
+
+const answerDiv = document.getElementById("answer");
+
+document.body.addEventListener("click", () => {
+  answerDiv.classList.add("flip");
+  setTimeout(() => {
+    const randomAnswer = answers[Math.floor(Math.random() * answers.length)];
+    answerDiv.textContent = randomAnswer;
+    answerDiv.classList.remove("flip");
+  }, 250);
+});
+</script>
+
+</body>
+</html>
