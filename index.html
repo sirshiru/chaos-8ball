@@ -40,6 +40,7 @@
     background-color: #f3c623;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     user-select: none;
+    z-index: 10001;
   }
   #achPage {
     display: none;
@@ -48,7 +49,7 @@
     width: 100vw; height: 100vh;
     background: #fff8f0;
     overflow-y: auto;
-    padding: 20px;
+    padding: 20px 50px 20px 20px;
     z-index: 9999;
   }
   #achList {
@@ -75,14 +76,18 @@
     box-shadow: 0 0 12px #4caf50aa;
   }
   #closeAch {
-    margin-top: 20px;
-    padding: 8px 12px;
-    cursor: pointer;
-    border-radius: 8px;
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    background: none;
     border: none;
-    background-color: #f3c623;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    cursor: pointer;
+    color: #f3c623;
     user-select: none;
+    z-index: 10002;
+    filter: drop-shadow(0 0 1px black);
   }
   #achievement {
     position: fixed;
@@ -115,14 +120,15 @@
 
 <div id="achPage">
   <h2>Achievements</h2>
+  <button id="closeAch">×</button>
   <div id="achList"></div>
-  <button id="closeAch">Close</button>
 </div>
 
 <div id="achievement"></div>
 
 <script>
 const answers = [
+  /* Your existing answers array here, unchanged */
   "It is decidedly so.",
   "Without a doubt.",
   "Absolutely, no hesitation.",
@@ -281,9 +287,55 @@ const achievements = {
     name: "Yes he would.",
     desc: "He's a liar.",
     unlocked: false,
+  },
+  quickClicker: {
+    name: "Quick Clicker",
+    desc: "Tapped 5 times in under 2 seconds.",
+    unlocked: false,
+    lastTapTimes: [],
+  },
+  existentialCrisis: {
+    name: "Existential Crisis",
+    desc: "Got 'The answer was inside you all along. Ew.'",
+    unlocked: false,
+  },
+  raccoonConsultant: {
+    name: "Raccoon Consultant",
+    desc: "Consulted a raccoon.",
+    unlocked: false,
+  },
+  danceFever: {
+    name: "Dance Fever",
+    desc: "Danced and saw what happened.",
+    unlocked: false,
+  },
+  moonWink: {
+    name: "Moon Wink",
+    desc: "Only if the moon winks at you.",
+    unlocked: false,
+  },
+  coffeeAddict: {
+    name: "Coffee Addict",
+    desc: "Asked for caffeine advice more than 3 times.",
+    unlocked: false,
+    count: 0,
+  },
+  flipYourPhone: {
+    name: "Flip Your Phone",
+    desc: "Tried flipping your phone and tried again.",
+    unlocked: false,
+  },
+  snackBringer: {
+    name: "Snack Bringer",
+    desc: "Brought snacks and got a yes.",
+    unlocked: false,
+  },
+  sockLoss: {
+    name: "Sock Loss",
+    desc: "Lost a sock due to the 8ball's advice.",
+    unlocked: false,
   }
 };
-
 
 const answerDiv = document.getElementById("answer");
 const achBtn = document.getElementById("achBtn");
@@ -349,6 +401,15 @@ document.body.addEventListener("click", () => {
   answerDiv.style.opacity = "1";
   answerDiv.classList.add("flip");
 
+  const now = Date.now();
+
+  // Quick Clicker tracking
+  achievements.quickClicker.lastTapTimes = achievements.quickClicker.lastTapTimes.filter(t => now - t < 2000);
+  achievements.quickClicker.lastTapTimes.push(now);
+  if (!achievements.quickClicker.unlocked && achievements.quickClicker.lastTapTimes.length >= 5) {
+    unlockAchievement("quickClicker");
+  }
+
   setTimeout(() => {
     const randomAnswer = answers[Math.floor(Math.random() * answers.length)];
     answerDiv.textContent = randomAnswer;
@@ -358,6 +419,13 @@ document.body.addEventListener("click", () => {
     achievements.fortuneSeeker.count++;
     if (!achievements.fortuneSeeker.unlocked && achievements.fortuneSeeker.count >= 10) {
       unlockAchievement("fortuneSeeker");
+    }
+
+    if (randomAnswer === "Cannot predict now." || randomAnswer === "Unclear, try caffeine first.") {
+      achievements.coffeeAddict.count++;
+      if (!achievements.coffeeAddict.unlocked && achievements.coffeeAddict.count >= 3) {
+        unlockAchievement("coffeeAddict");
+      }
     }
 
     // Unlucky Break tracking
@@ -426,17 +494,33 @@ document.body.addEventListener("click", () => {
       unlockAchievement("riskyBiz");
     }
     if (randomAnswer ===  "Would I lie to you? (Don't answer that.)") {
-      unlockAchievement("liar")
+      unlockAchievement("liar");
+    }
+    if (randomAnswer === "The baguette has spoken.") {
+      unlockAchievement("raccoonConsultant");
+    }
+    if (randomAnswer === "Dance and see what happens.") {
+      unlockAchievement("danceFever");
+    }
+    if (randomAnswer === "Only if the moon winks at you.") {
+      unlockAchievement("moonWink");
+    }
+    if (randomAnswer === "Flip your phone and try again.") {
+      unlockAchievement("flipYourPhone");
+    }
+    if (randomAnswer === "No, unless you bring snacks.") {
+      unlockAchievement("snackBringer");
+    }
+    if (randomAnswer === "Yes, but it'll cost you a sock.") {
+      unlockAchievement("sockLoss");
+    }
+    if (randomAnswer === "The answer was inside you all along. Ew.") {
+      unlockAchievement("existentialCrisis");
     }
 
-    // Bonus: if user taps too fast (e.g. multiple clicks before flip ends)
-    // We could do a simple time check (optional, but fun)
   }, 250);
 });
-
 </script>
 
 </body>
 </html>
-
-
