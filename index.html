@@ -1,4 +1,9 @@
-<!DOCTYPE>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Totally Accurate 8ball (maybe)</title>
 <style>
   body {
     background: #fff8f0;
@@ -10,19 +15,111 @@
     align-items: center;
     height: 100vh;
     user-select: none;
+    margin: 0;
+    flex-direction: column;
   }
   #answer {
     font-size: 1.8em;
     max-width: 90%;
     transition: transform 0.5s ease, opacity 1s ease;
+    opacity: 1;
+    margin-bottom: 20px;
   }
   .flip {
     transform: rotateY(180deg);
   }
-  .fade-out {
+  #achBtn {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 8px 12px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px;
+    border: none;
+    background-color: #f3c623;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    user-select: none;
+  }
+  #achPage {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: #fff8f0;
+    overflow-y: auto;
+    padding: 20px;
+    z-index: 9999;
+  }
+  #achList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+  }
+  .achievement {
+    width: 160px;
+    border: 2px solid #ccc;
+    border-radius: 12px;
+    padding: 10px;
+    background-color: #eee;
+    color: #666;
+    user-select: none;
+    box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+  }
+  .achievement.unlocked {
+    border-color: #4caf50;
+    background-color: #d4ffd4;
+    color: #000;
+    box-shadow: 0 0 12px #4caf50aa;
+  }
+  #closeAch {
+    margin-top: 20px;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 8px;
+    border: none;
+    background-color: #f3c623;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    user-select: none;
+  }
+  #achievement {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ffda6a;
+    color: #222;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
     opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    user-select: none;
+    z-index: 10000;
+  }
+  #achievement.show {
+    opacity: 1;
+    pointer-events: auto;
   }
 </style>
+</head>
+<body>
+
+<div id="answer">Tap anywhere to get your fate...</div>
+
+<button id="achBtn">Achievements</button>
+
+<div id="achPage">
+  <h2>Achievements</h2>
+  <div id="achList"></div>
+  <button id="closeAch">Close</button>
+</div>
+
+<div id="achievement"></div>
 
 <script>
 const answers = [
@@ -103,10 +200,153 @@ const answers = [
   "The answer was inside you all along. Ew."
 ];
 
+const achievements = {
+  selfDestruct: {
+    name: "Self-Destruct Survivor",
+    desc: "Saw the message self-destruct and lived to tell the tale.",
+    unlocked: false,
+  },
+  beanbagSeeker: {
+    name: "Beanbag Seeker",
+    desc: "Sought the beanbag chair of destiny.",
+    unlocked: false,
+  },
+  prophecyDemander: {
+    name: "Prophecy Demander",
+    desc: "Witnessed the prophecy demand it.",
+    unlocked: false,
+  },
+  prophecyForbidder: {
+    name: "Prophecy Forbidder",
+    desc: "Witnessed the prophecy forbid it.",
+    unlocked: false,
+  },
+  cowardCaller: {
+    name: "Coward Caller",
+    desc: "Called someone a coward like a champ.",
+    unlocked: false,
+  },
+  frenchBoi: {
+    name: "The French",
+    desc: "Witness a french message. (scary)",
+    unlocked: false,
+  },
+  jittery: {
+    name: "Jittery Tapper",
+    desc: "Tapped faster than the CSS transition can keep up.",
+    unlocked: false,
+  },
+  unluckyBreak: {
+    name: "Unlucky Break",
+    desc: "Got 'This is a disaster waiting to happen.' twice.",
+    unlocked: false,
+    count: 0,
+  },
+  fortuneSeeker: {
+    name: "Fortune Seeker",
+    desc: "Asked the 8ball 10 times.",
+    unlocked: false,
+    count: 0,
+  },
+  skepticalSeal: {
+    name: "Skeptical Seal",
+    desc: "Got 'My circuits say no.' 3 times.",
+    unlocked: false,
+    count: 0,
+  },
+  wiseOne: {
+    name: "Wise One",
+    desc: "Got 'Ask again later.' 5 times.",
+    unlocked: false,
+    count: 0,
+  },
+  backflipInitiate: {
+    name: "Backflip Initiate",
+    desc: "Heard the backflip advice and lived to try it.",
+    unlocked: false,
+  },
+  riskyBiz: {
+    name: "Risky Biz",
+    desc: "Got a 'Do it. Or don't. I'm not your mom.' answer.",
+    unlocked: false,
+  },
+  cheeseLover: {
+    name: "Cheese Lover",
+    desc: "Saw both 'The cheese says oui.' and 'The cheese says non.'",
+    unlocked: false,
+    ouiGot: false,
+    nonGot: false,
+  },
+  liar: {
+    name: "Yes he would.",
+    desc: "He's a liar.",
+    unlocked: false,
+  }
+};
+
+
 const answerDiv = document.getElementById("answer");
+const achBtn = document.getElementById("achBtn");
+const achPage = document.getElementById("achPage");
+const closeAch = document.getElementById("closeAch");
+const achList = document.getElementById("achList");
+const achievementDiv = document.getElementById("achievement");
+
+function showAchievement(text) {
+  achievementDiv.textContent = text;
+  achievementDiv.classList.add("show");
+  setTimeout(() => {
+    achievementDiv.classList.remove("show");
+  }, 3000);
+}
+
+function loadAchievements() {
+  const saved = localStorage.getItem("achievements");
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    for (const key in parsed) {
+      if (achievements[key]) achievements[key].unlocked = parsed[key];
+    }
+  }
+}
+
+function saveAchievements() {
+  const toSave = {};
+  for (const key in achievements) {
+    toSave[key] = achievements[key].unlocked;
+  }
+  localStorage.setItem("achievements", JSON.stringify(toSave));
+}
+
+function renderAchievements() {
+  achList.innerHTML = "";
+  for (const key in achievements) {
+    const ach = achievements[key];
+    const div = document.createElement("div");
+    div.className = "achievement" + (ach.unlocked ? " unlocked" : "");
+    div.innerHTML = `<strong>${ach.name}</strong><br><small>${ach.desc}</small>`;
+    achList.appendChild(div);
+  }
+}
+
+function unlockAchievement(key) {
+  if (!achievements[key]) return;
+  if (!achievements[key].unlocked) {
+    achievements[key].unlocked = true;
+    saveAchievements();
+    renderAchievements();
+    showAchievement(`Achievement unlocked: ${achievements[key].name}`);
+  }
+}
+
+achBtn.addEventListener("click", () => (achPage.style.display = "block"));
+closeAch.addEventListener("click", () => (achPage.style.display = "none"));
+
+loadAchievements();
+renderAchievements();
 
 document.body.addEventListener("click", () => {
-  answerDiv.style.opacity = "1"; // reset visibility every click
+  answerDiv.style.opacity = "1";
   answerDiv.classList.add("flip");
 
   setTimeout(() => {
@@ -114,13 +354,89 @@ document.body.addEventListener("click", () => {
     answerDiv.textContent = randomAnswer;
     answerDiv.classList.remove("flip");
 
+    // Track some counters for achievements
+    achievements.fortuneSeeker.count++;
+    if (!achievements.fortuneSeeker.unlocked && achievements.fortuneSeeker.count >= 10) {
+      unlockAchievement("fortuneSeeker");
+    }
+
+    // Unlucky Break tracking
+    if (randomAnswer === "This is a disaster waiting to happen.") {
+      achievements.unluckyBreak.count++;
+      if (!achievements.unluckyBreak.unlocked && achievements.unluckyBreak.count >= 2) {
+        unlockAchievement("unluckyBreak");
+      }
+    }
+
+    // Skeptical Seal tracking
+    if (randomAnswer === "My circuits say no.") {
+      achievements.skepticalSeal.count++;
+      if (!achievements.skepticalSeal.unlocked && achievements.skepticalSeal.count >= 3) {
+        unlockAchievement("skepticalSeal");
+      }
+    }
+
+    // Wise One tracking
+    if (randomAnswer === "Ask again later.") {
+      achievements.wiseOne.count++;
+      if (!achievements.wiseOne.unlocked && achievements.wiseOne.count >= 5) {
+        unlockAchievement("wiseOne");
+      }
+    }
+
+    // Unlock single-shot achievements
     if (randomAnswer === "This message will self-destruct.") {
+      unlockAchievement("selfDestruct");
       setTimeout(() => {
-        answerDiv.style.opacity = "0"; // fade away after 1.5s
+        answerDiv.style.opacity = "0";
       }, 1500);
     }
+    if (randomAnswer === "Seek the beanbag chair of destiny.") {
+      unlockAchievement("beanbagSeeker");
+    }
+    if (randomAnswer === "YES — THE PROPHECY DEMANDS IT.") {
+      unlockAchievement("prophecyDemander");
+    }
+    if (randomAnswer === "NO — THE PROPHECY FORBIDS IT.") {
+      unlockAchievement("prophecyForbidder");
+    }
+    if (randomAnswer === "You already know the answer, coward.") {
+      unlockAchievement("cowardCaller");
+    }
+    if (randomAnswer === "The cheese says oui.") { 
+      achievements.cheeseLover.ouiGot = true;
+      if (achievements.cheeseLover.ouiGot && achievements.cheeseLover.nonGot && !achievements.cheeseLover.unlocked) {
+        unlockAchievement("cheeseLover");
+      } else {
+        unlockAchievement("frenchBoi");
+      }
+    }
+    if (randomAnswer === "The cheese says non.") { 
+      achievements.cheeseLover.nonGot = true;
+      if (achievements.cheeseLover.ouiGot && achievements.cheeseLover.nonGot && !achievements.cheeseLover.unlocked) {
+        unlockAchievement("cheeseLover");
+      } else {
+        unlockAchievement("frenchBoi");
+      }
+    }
+    if (randomAnswer === "Do a backflip first.") {
+      unlockAchievement("backflipInitiate");
+    }
+    if (randomAnswer === "Do it. Or don't. I'm not your mom.") {
+      unlockAchievement("riskyBiz");
+    }
+    if (randomAnswer ===  "Would I lie to you? (Don't answer that.)") {
+      unlockAchievement("liar")
+    }
+
+    // Bonus: if user taps too fast (e.g. multiple clicks before flip ends)
+    // We could do a simple time check (optional, but fun)
   }, 250);
 });
 
 </script>
+
+</body>
+</html>
+
 
