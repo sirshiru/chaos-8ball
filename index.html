@@ -1,8 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Totally Accurate 8ball (maybe)</title>
 <style>
   body {
     background: #fff8f0;
@@ -18,16 +13,15 @@
   #answer {
     font-size: 1.8em;
     max-width: 90%;
-    transition: transform 0.5s ease;
+    transition: transform 0.5s ease, opacity 1s ease;
   }
   .flip {
     transform: rotateY(180deg);
   }
+  .fade-out {
+    opacity: 0;
+  }
 </style>
-</head>
-<body>
-
-<div id="answer">Tap anywhere to get your fate...</div>
 
 <script>
 const answers = [
@@ -108,8 +102,6 @@ const answers = [
   "The answer was inside you all along. Ew."
 ];
 
-
-
 const answerDiv = document.getElementById("answer");
 
 document.body.addEventListener("click", () => {
@@ -118,9 +110,17 @@ document.body.addEventListener("click", () => {
     const randomAnswer = answers[Math.floor(Math.random() * answers.length)];
     answerDiv.textContent = randomAnswer;
     answerDiv.classList.remove("flip");
+
+    if (randomAnswer === "This message will self-destruct.") {
+      setTimeout(() => {
+        answerDiv.classList.add("fade-out");
+        setTimeout(() => {
+          answerDiv.textContent = ""; // remove after fade
+          answerDiv.classList.remove("fade-out");
+        }, 1000); // match CSS fade time
+      }, 1500); // delay before starting fade
+    }
   }, 250);
 });
 </script>
 
-</body>
-</html>
