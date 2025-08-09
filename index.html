@@ -106,7 +106,9 @@ const answers = [
 const answerDiv = document.getElementById("answer");
 
 document.body.addEventListener("click", () => {
+  answerDiv.style.opacity = "1"; // reset visibility every click
   answerDiv.classList.add("flip");
+
   setTimeout(() => {
     const randomAnswer = answers[Math.floor(Math.random() * answers.length)];
     answerDiv.textContent = randomAnswer;
@@ -114,14 +116,11 @@ document.body.addEventListener("click", () => {
 
     if (randomAnswer === "This message will self-destruct.") {
       setTimeout(() => {
-        answerDiv.classList.add("fade-out");
-        setTimeout(() => {
-          answerDiv.textContent = ""; // remove after fade
-          answerDiv.classList.remove("fade-out");
-        }, 1000); // match CSS fade time
-      }, 1500); // delay before starting fade
+        answerDiv.style.opacity = "0"; // fade away after 1.5s
+      }, 1500);
     }
   }, 250);
 });
+
 </script>
 
